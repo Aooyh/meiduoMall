@@ -1,9 +1,8 @@
-from django.http import HttpResponse
+from rest_framework.generics import CreateAPIView
+from .serializers import RegisterSerializer
 from rest_framework.views import APIView
-from libs.captcha.captcha import captcha
 from rest_framework import status
 from rest_framework.response import Response
-from django_redis import get_redis_connection
 from .models import User
 
 # Create your views here.
@@ -29,3 +28,13 @@ class RegisterGetMobile(APIView):
     def get(request, mobile):
         count = User.objects.filter(mobile=mobile).count()
         return Response(data={'count': count}, status=status.HTTP_200_OK)
+
+
+class RegisterCreateView(CreateAPIView):
+    """
+    用户注册
+    """
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request)

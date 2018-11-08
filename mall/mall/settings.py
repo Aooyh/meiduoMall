@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import sys
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ SECRET_KEY = '3-3=i$k(e!+$q&y9ds891mi1m8s^&dc1bg_y3^77^#cx3=gskf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'api.meiduo.site', 'www.meiduo.site']
 
 
 # Application definition
@@ -46,10 +47,12 @@ INSTALLED_APPS = [
     'goods.apps.GoodsConfig',
     'oauth.apps.OauthConfig',
     'orders.apps.OrdersConfig',
-    'pay.apps.PayConfig'
+    'pay.apps.PayConfig',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,6 +61,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS
+CORS_ORIGIN_WHITELIST = (
+    '127.0.0.1:8080',
+    'localhost:8080',
+    'www.meiduo.site:8080',
+    'api.meiduo.site:8080'
+)
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 ROOT_URLCONF = 'mall.urls'
 
@@ -207,6 +219,19 @@ LOGGING = {
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'utils.users.jwt_response_payload_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
 }
 
 AUTH_USER_MODEL = 'users.User'
+AUTHENTICATION_BACKENDS = [
+   'utils.users.UsernameMobileAuthBackend',
+]
