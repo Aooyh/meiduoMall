@@ -75,3 +75,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         jwt_payload = jwt_payload_handler(user)
         user.token = jwt_encode_handler(jwt_payload)
         return user
+
+
+class EmailUpdateSerializer(serializers.Serializer):
+    email = serializers.EmailField(label='邮箱')
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data['email']
+        instance.save()
+        return instance

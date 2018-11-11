@@ -4,8 +4,11 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^usernames/(?P<username>\w{5,20})/count/', views.RegisterGetUserName.as_view(), name='username_count'),
-    url(r'^phones/(?P<mobile>1[35789]\d{9})/count/', views.RegisterGetMobile.as_view(), name='mobile_count'),
+    url(r'^usernames/(?P<username>\w{5,20})/count/$', views.RegisterGetUserName.as_view(), name='username_count'),
+    url(r'^phones/(?P<mobile>1[35789]\d{9})/count/$', views.RegisterGetMobile.as_view(), name='mobile_count'),
     url(r'^$', views.RegisterCreateView.as_view(), name='user_register'),
-    url(r'^auths/', obtain_jwt_token, name='auth')
+    url(r'^auths/$', obtain_jwt_token, name='auth'),
+    url(r'^infos/$', views.UserInfoAPIView.as_view()),
+    url(r'^emails/$', views.SendEmailAPIView.as_view()),
+    url(r'^emails/verification/$', views.EmailVerifyAPIView.as_view()),
 ]
