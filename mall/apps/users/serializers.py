@@ -1,8 +1,17 @@
 from rest_framework import serializers
-from users.models import User
+from users.models import User, Address
 from django_redis import get_redis_connection
 from rest_framework_jwt.views import api_settings
 import re
+
+
+def mobile_check(mobile):
+    """
+    手机号合法性校验
+    """
+    if not re.match(r'1[356789]\d{9}$', mobile):
+        raise serializers.ValidationError('手机号格式不正确')
+    return mobile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -30,12 +39,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def validate_mobile(self, value):
-        """
-        手机号合法性校验
-        """
-        if not re.match(r'1[356789]\d{9}$', value):
-            raise serializers.ValidationError('手机号格式不正确')
-        return value
+        return mobile_check(value)
 
     def validate(self, attrs):
         # 验证是否同意协议
@@ -84,3 +88,24 @@ class EmailUpdateSerializer(serializers.Serializer):
         instance.email = validated_data['email']
         instance.save()
         return instance
+
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        exclude = ['update_time', 'user_id', 'is_delete', 'create_time']
+
+    def validate_mobile(self, value):
+        return mobile_check(value)
+
+    def create(self, validated_data):
+        """
+        重写创建对象的方法
+        """
+        # 获取用户
+        request = self.context.get('request')
+        user = request.user
+
+        # 将用户添加到检验过的数据中
+        validated_data['user_id'] = user.id
+        return super().create(validated_data)

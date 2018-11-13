@@ -1,13 +1,14 @@
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from celery_tasks.email.tasks import send_verify_mail
 from itsdangerous import TimedJSONWebSignatureSerializer as JWSSerializer, BadSignature
 from mall import settings
-from .serializers import RegisterSerializer, EmailUpdateSerializer
+from .serializers import RegisterSerializer, EmailUpdateSerializer, UserAddressSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .models import User
+from .models import User, Address
+
 
 # Create your views here.
 
@@ -112,3 +113,13 @@ class EmailVerifyAPIView(APIView):
         user = User.objects.filter(id=user_id)
         user.update(email_active=True)
         return Response({'message': '邮箱验证成功'})
+
+
+class AddressAPIView(CreateAPIView, ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = [UserAddressSerializer]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Address.objects.filter(user_id=user.id).all()
+        return queryset
