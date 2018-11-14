@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import datetime
+from django.utils import timezone
 
 
 # Create your models here.
@@ -33,7 +33,7 @@ class Address(models.Model):
     place = models.CharField(max_length=50, verbose_name='详细地址')
     is_delete = models.BooleanField(default=False, verbose_name='是否删除')
     update_time = models.DateField(auto_now=True, verbose_name='更新时间')
-    create_time = models.DateField(verbose_name='创建时间', default=datetime.now())
+    create_time = models.DateField(verbose_name='创建时间', default=timezone.now)
 
     class Meta:
         db_table = 'tb_user_add'

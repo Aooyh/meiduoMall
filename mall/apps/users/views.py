@@ -123,3 +123,9 @@ class AddressAPIView(CreateAPIView, ListAPIView):
         user = self.request.user
         queryset = Address.objects.filter(user_id=user.id).all()
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        if self.get_queryset():
+            return super().list(self, request)
+        else:
+            return Response({'message': '未设置地址'})

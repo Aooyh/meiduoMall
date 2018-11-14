@@ -48,7 +48,10 @@ INSTALLED_APPS = [
     'oauth.apps.OauthConfig',
     'orders.apps.OrdersConfig',
     'pay.apps.PayConfig',
-    'corsheaders'
+    'corsheaders',
+    'ckeditor',
+    'ckeditor_uploader',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +79,7 @@ ROOT_URLCONF = 'mall.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,6 +91,9 @@ TEMPLATES = [
         },
     },
 ]
+
+# 生成的静态html文件保存目录
+GENERATED_STATIC_HTML_FILES_DIR = os.path.join(os.path.dirname(BASE_DIR), 'front')
 
 WSGI_APPLICATION = 'mall.wsgi.application'
 
@@ -251,3 +257,28 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'Aoo_yh@163.com'
 EMAIL_HOST_PASSWORD = 'zq363621416'
 EMAIL_FROM = 'MeiduoMall官方<aoo_yh@163.com>'
+
+# FastDFS
+FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
+FDFS_URL = 'http://192.168.6.131:8888/'
+
+# File storage
+DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.FastDFSStorage'
+
+# 富文本编辑器ckeditor配置
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',  # 工具条功能
+        'height': 300,  # 编辑器高度
+        # 'width': 300,  # 编辑器宽
+    },
+}
+CKEDITOR_UPLOAD_PATH = ''  # 上传图片保存路径，使用了FastDFS，所以此处设为''
+
+CRONJOBS = [
+    # 每五分钟生成一次静态文件
+    ('*/1 * * * *', 'contents.crons.generate_static_index_html', '>> /home/python/meiduoMall/mall/logs/crontab.log')
+]
+
+# 解决crontab中文问题
+CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
