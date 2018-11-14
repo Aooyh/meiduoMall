@@ -1,2 +1,2 @@
 # meiduoMall
-A C2C  shopping website
+A B2C  shopping website
